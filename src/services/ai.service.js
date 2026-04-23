@@ -119,21 +119,30 @@ async function generateInterviewReport({
     },
   });
 
-  return JSON.parse(response.text);
+  // i changed something here
+  let parsed;
+
+  try {
+    parsed = JSON.parse(response.text);
+  } catch (err) {
+    console.error("AI JSON parse error:", response.text);
+    throw new Error("Invalid AI response format");
+  }
+
+  return parsed;
 }
 
 async function generatePdfFromHtml(htmlContent) {
   let browser;
 
   if (process.env.VERCEL) {
-    // ✅ Vercel (serverless)
     browser = await puppeteer.launch({
       args: chromium.args,
       executablePath: await chromium.executablePath(),
       headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport, // ✅ yaha add kar
     });
   } else {
-    // ✅ Local machine
     browser = await puppeteer.launch({
       headless: true,
     });
@@ -142,7 +151,8 @@ async function generatePdfFromHtml(htmlContent) {
   const page = await browser.newPage();
 
   await page.setContent(htmlContent, {
-    waitUntil: "networkidle0",
+    waitUntil: "domcontentloaded",
+    timeout: 30000,
   });
 
   const pdfBuffer = await page.pdf({
@@ -191,7 +201,14 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
     },
   });
 
-  const jsonContent = JSON.parse(response.text);
+  let jsonContent;
+
+  try {
+    jsonContent = JSON.parse(response.text);
+  } catch (err) {
+    console.error("Resume AI JSON parse error:", response.text);
+    throw new Error("Invalid resume AI response");
+  }
 
   const pdfBuffer = await generatePdfFromHtml(jsonContent.html);
 

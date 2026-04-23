@@ -7,9 +7,6 @@ const dns = require("dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 module.exports = async (req, res) => {
-  await connectToDB(); // 🔥 THIS LINE FIXES EVERYTHING
+  await connectToDB(); // 🔥 runs every request
   return app(req, res);
 };
-
-// ✅ serverless export
-module.exports = app;

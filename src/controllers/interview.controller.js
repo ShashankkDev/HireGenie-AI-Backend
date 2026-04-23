@@ -6,6 +6,9 @@ const {
 const interviewReportModel = require("../models/interviewReport.model");
 const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
+// fix for vercel
+pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.js");
+
 /**
  * PDF text extractor (Vercel compatible)
  */
@@ -13,6 +16,7 @@ async function extractTextFromPDF(buffer) {
   const loadingTask = pdfjsLib.getDocument({
     data: new Uint8Array(buffer),
   });
+
   const pdf = await loadingTask.promise;
 
   let text = "";

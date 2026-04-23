@@ -123,9 +123,7 @@ async function generateResumePdfController(req, res) {
     await interviewReportModel.findById(interviewReportId);
 
   if (!interviewReport) {
-    return res.status(404).json({
-      message: "Interview report not found.",
-    });
+    return res.status(404).json({ message: "Interview report not found." });
   }
 
   const { resume, jobDescription, selfDescription } = interviewReport;
@@ -136,15 +134,25 @@ async function generateResumePdfController(req, res) {
     selfDescription,
   });
 
-  res.set({
-    "Content-Type": "application/pdf",
-    "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`,
-    "Content-Length": pdfBuffer.length,
-  });
+  // ✅ Convert to Buffer explicitly
+  const buffer = Buffer.isBuffer(pdfBuffer)
+    ? pdfBuffer
+    : Buffer.from(pdfBuffer);
 
-  console.log("PDF Buffer size:", pdfBuffer?.length);
+  console.log("PDF Buffer size:", buffer.length);
+  console.log("Is Buffer:", Buffer.isBuffer(buffer));
+  console.log("First bytes:", buffer.slice(0, 4).toString()); // Should print "%PDF"
 
-  res.end(pdfBuffer);
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=resume_${interviewReportId}.pdf`,
+  );
+  res.setHeader("Content-Length", buffer.length);
+
+  // ✅ Use write + end instead of send/json
+  res.write(buffer);
+  res.end();
 }
 
 module.exports = {

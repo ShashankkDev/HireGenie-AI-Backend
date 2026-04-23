@@ -139,11 +139,12 @@ async function generateResumePdfController(req, res) {
   res.set({
     "Content-Type": "application/pdf",
     "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`,
+    "Content-Length": pdfBuffer.length,
   });
 
   console.log("PDF Buffer size:", pdfBuffer?.length);
 
-  res.send(pdfBuffer);
+  res.end(pdfBuffer);
 }
 
 module.exports = {

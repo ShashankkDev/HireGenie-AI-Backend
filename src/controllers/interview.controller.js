@@ -31,33 +31,42 @@ async function extractTextFromPDF(buffer) {
  * @description Controller to generate interview report based on user self description, resume and job description.
  */
 async function generateInterViewReportController(req, res) {
-  if (!req.file) {
-    return res.status(400).json({
-      message: "Resume file is required",
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        message: "Resume file is required",
+      });
+    }
+
+    const resumeText = await extractTextFromPDF(req.file.buffer);
+    const { selfDescription, jobDescription } = req.body;
+
+    const interViewReportByAi = await generateInterviewReport({
+      resume: resumeText,
+      selfDescription,
+      jobDescription,
+    });
+
+    const interviewReport = await interviewReportModel.create({
+      user: req.user.id,
+      resume: resumeText,
+      selfDescription,
+      jobDescription,
+      ...interViewReportByAi,
+    });
+
+    res.status(201).json({
+      message: "Interview report generated successfully.",
+      interviewReport,
+    });
+  } catch (err) {
+    console.error("🔥 ERROR:", err);
+
+    res.status(500).json({
+      message: "Failed to generate interview report",
+      error: err.message,
     });
   }
-
-  const resumeText = await extractTextFromPDF(req.file.buffer);
-  const { selfDescription, jobDescription } = req.body;
-
-  const interViewReportByAi = await generateInterviewReport({
-    resume: resumeText,
-    selfDescription,
-    jobDescription,
-  });
-
-  const interviewReport = await interviewReportModel.create({
-    user: req.user.id,
-    resume: resumeText,
-    selfDescription,
-    jobDescription,
-    ...interViewReportByAi,
-  });
-
-  res.status(201).json({
-    message: "Interview report generated successfully.",
-    interviewReport,
-  });
 }
 
 /**

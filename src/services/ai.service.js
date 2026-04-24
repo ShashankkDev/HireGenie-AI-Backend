@@ -99,6 +99,22 @@ const interviewReportSchema = z.object({
     ),
 });
 
+async function retryWithDelay(fn, retries = 3, delayMs = 3000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRetryable = err?.status === 503 || err?.status === 429;
+      if (isRetryable && i < retries - 1) {
+        console.log(`Retrying after ${delayMs}ms... (attempt ${i + 1})`);
+        await new Promise((res) => setTimeout(res, delayMs));
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
 async function generateInterviewReport({
   resume,
   selfDescription,
@@ -110,14 +126,16 @@ async function generateInterviewReport({
                         Job Description: ${jobDescription}
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: zodToJsonSchema(interviewReportSchema),
-    },
-  });
+  const response = await retryWithDelay(() =>
+    ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: zodToJsonSchema(interviewReportSchema),
+      },
+    }),
+  );
 
   // i changed something here
   let parsed;
@@ -192,14 +210,16 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                         The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
                     `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: prompt,
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: zodToJsonSchema(resumePdfSchema),
-    },
-  });
+  const response = await retryWithDelay(() =>
+    ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: zodToJsonSchema(resumePdfSchema),
+      },
+    }),
+  );
 
   let jsonContent;
 

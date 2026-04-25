@@ -92,7 +92,7 @@ async function loginUserController(req, res) {
     httpOnly: true,
     secure: true, // 🔥 HTTPS ke liye required
     sameSite: "none", // 🔥 cross-origin ke liye MUST
-    path: "/", // ✅ ADD THIS
+    domain: ".vercel.app", // ✅ ADD THIS
   });
 
   res.status(200).json({
@@ -121,7 +121,7 @@ async function logoutUserController(req, res) {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    path: "/",
+    domain: ".vercel.app",
   });
 
   res.status(200).json({

@@ -43,8 +43,9 @@ async function registerUserController(req, res) {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true, // 🔥 HTTPS ke liye required
-    sameSite: "none", // 🔥 cross-origin ke liye MUST
+    secure: true,
+    sameSite: "none",
+    path: "/", // ✅ ADD THIS
   });
 
   res.status(201).json({
@@ -91,6 +92,7 @@ async function loginUserController(req, res) {
     httpOnly: true,
     secure: true, // 🔥 HTTPS ke liye required
     sameSite: "none", // 🔥 cross-origin ke liye MUST
+    path: "/", // ✅ ADD THIS
   });
 
   res.status(200).json({
@@ -119,6 +121,7 @@ async function logoutUserController(req, res) {
     httpOnly: true,
     secure: true,
     sameSite: "none",
+    path: "/",
   });
 
   res.status(200).json({

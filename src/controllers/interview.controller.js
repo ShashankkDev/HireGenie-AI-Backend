@@ -1,10 +1,8 @@
-// const pdfParse = require("pdf-parse")
 const {
   generateInterviewReport,
   generateResumePdf,
 } = require("../services/ai.service");
 const interviewReportModel = require("../models/interviewReport.model");
-// const pdfParse = require("pdf-parse");
 const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
 // fix for vercel

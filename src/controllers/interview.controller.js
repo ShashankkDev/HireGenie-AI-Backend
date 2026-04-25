@@ -4,38 +4,34 @@ const {
   generateResumePdf,
 } = require("../services/ai.service");
 const interviewReportModel = require("../models/interviewReport.model");
-const pdfParse = require("pdf-parse");
-// const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
+// const pdfParse = require("pdf-parse");
+const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
-// fix for vercel
-// pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.js");
+fix for vercel
+pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.js");
 
 /**
  * PDF text extractor (Vercel compatible)
  */
-// async function extractTextFromPDF(buffer) {
-//   const loadingTask = pdfjsLib.getDocument({
-//     data: new Uint8Array(buffer),
-//   });
-
-//   const pdf = await loadingTask.promise;
-
-//   let text = "";
-
-//   for (let i = 1; i <= pdf.numPages; i++) {
-//     const page = await pdf.getPage(i);
-//     const content = await page.getTextContent();
-
-//     text += content.items.map((item) => item.str).join(" ") + "\n";
-//   }
-
-//   return text;
-// }
-
 async function extractTextFromPDF(buffer) {
-  const data = await pdfParse(buffer);
-  return data.text;
+  const loadingTask = pdfjsLib.getDocument({
+    data: new Uint8Array(buffer),
+  });
+
+  const pdf = await loadingTask.promise;
+
+  let text = "";
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+
+    text += content.items.map((item) => item.str).join(" ") + "\n";
+  }
+
+  return text;
 }
+
 
 /**
  * @description Controller to generate interview report based on user self description, resume and job description.

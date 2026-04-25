@@ -21,7 +21,6 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.2.1",
     "multer": "^2.0.2",
-    "pdf-parse": "^2.4.5",
     "pdfjs-dist": "^3.11.174",
     "puppeteer": "^24.42.0",
     "puppeteer-core": "^24.42.0",

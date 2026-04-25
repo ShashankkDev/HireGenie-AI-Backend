@@ -7,7 +7,7 @@ const interviewReportModel = require("../models/interviewReport.model");
 // const pdfParse = require("pdf-parse");
 const pdfjsLib = require("pdfjs-dist/legacy/build/pdf.js");
 
-fix for vercel
+// fix for vercel
 pdfjsLib.GlobalWorkerOptions.workerSrc = require("pdfjs-dist/build/pdf.worker.js");
 
 /**
@@ -31,7 +31,6 @@ async function extractTextFromPDF(buffer) {
 
   return text;
 }
-
 
 /**
  * @description Controller to generate interview report based on user self description, resume and job description.
